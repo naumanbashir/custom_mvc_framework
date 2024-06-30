@@ -4,9 +4,15 @@ namespace App\core;
 
 class Application
 {
-    public function __construct(
-        public Router $router
-    )
+    public Router $router;
+
+    public function __construct()
     {
+        $this->router = new Router();
+    }
+
+    public function run()
+    {
+        // TODO: in progress
     }
 }

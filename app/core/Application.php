@@ -4,15 +4,25 @@ namespace App\core;
 
 class Application
 {
-    public Router $router;
+    public static Application $app;
+    public static string $ROOT_DIR;
 
-    public function __construct()
+    public Request $request;
+    public Router $router;
+    public Response $response;
+
+    public function __construct($rootPath)
     {
-        $this->router = new Router();
+        self::$app = $this;
+        self::$ROOT_DIR = $rootPath;
+
+        $this->request = new Request();
+        $this->response = new Response();
+        $this->router = new Router($this->request);
     }
 
-    public function run()
+    public function run(): void
     {
-        // TODO: in progress
+        echo $this->router->resolve();
     }
 }

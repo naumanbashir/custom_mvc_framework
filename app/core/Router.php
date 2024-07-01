@@ -2,6 +2,9 @@
 
 namespace App\core;
 
+use App\Http\Controllers\HomeController;
+use Closure;
+
 class Router
 {
     protected array $routes;
@@ -13,9 +16,14 @@ class Router
 
     }
 
-    public function get($path, $callback): void
+    public function get($path, $handler): void
     {
-        $this->routes['GET'][$path] = $callback;
+        $this->routes['GET'][$path] = $handler;
+    }
+
+    public function post($path, $handler): void
+    {
+        $this->routes['POST'][$path] = $handler;
     }
 
     public function resolve()
@@ -23,24 +31,35 @@ class Router
         $path = $this->request->getPath();
         $method = $this->request->getMethod();
 
-        $callback = $this->routes[$method][$path] ?? null;
+        $handler = $this->routes[$method][$path] ?? null;
 
-        if (!$callback){
+        if (!$handler){
             Application::$app->response->setStatusCode(404);
             return 'No route found for "' . $path . '"';
         }
 
-        if (is_string($callback)) {
-            return $this->renderView($callback);
-        }
+        /** Check if the Route handler is a Closure */
+        if ($handler instanceof Closure)  return $handler();
 
-        return call_user_func($callback);
+        $controller = '';
+        $method = '';
+
+        /** Check if the Route handler is a string with Controller Name and method name imploded with @ */
+        if (is_string($handler))
+            list($controller, $method) = explode('@', $handler);
+
+        /** Check if the Route handler is an array with Controller Name constant and method name */
+        if (is_array($handler)) list($controller, $method) = $handler;
+
+        if (!class_exists($controller))
+            throw new \Exception("Controller '" . $controller . "' does not exist");
+
+        $controller = new $controller();
+        return $controller->{$method}();
     }
 
     public function renderView(string $view, $params = []): string
     {
-        dd($params);
-
         $layoutContent = $this->renderLayout();
         $viewContent = $this->renderOnlyView($view);
 

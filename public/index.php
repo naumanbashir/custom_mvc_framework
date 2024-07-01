@@ -7,7 +7,7 @@ use App\core\Application;
 $rootDir = dirname(__DIR__);
 $app = new Application($rootDir);
 
-$app->router->get('/', 'welcome');
+$app->router->get('/', [HomeController::class, 'index']);
 
 $app->run();
 

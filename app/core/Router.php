@@ -37,8 +37,10 @@ class Router
         return call_user_func($callback);
     }
 
-    private function renderView(string $view): string
+    public function renderView(string $view, $params = []): string
     {
+        dd($params);
+
         $layoutContent = $this->renderLayout();
         $viewContent = $this->renderOnlyView($view);
 

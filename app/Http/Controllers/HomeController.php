@@ -8,6 +8,6 @@ class HomeController extends Controller
     {
         $title = 'Custom MVC Framework';
 
-        $this->render('home', compact('title'));
+        $this->render('welcome', compact('title'));
     }
 }
